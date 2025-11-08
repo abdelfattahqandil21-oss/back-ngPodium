@@ -62,18 +62,68 @@ export class PostsService {
   }
 
   async search(q: string, limit = 5): Promise<Post[]> {
-    const term = (q ?? '').toString().trim().toLowerCase();
-    if (!term) return [];
+    const raw = (q ?? '').toString().trim();
+    if (!raw) return [];
+
+    const term = raw.toLowerCase();
+    const tokens = Array.from(new Set(term.split(/\s+/g).filter(Boolean)));
+    if (!tokens.length) return [];
+
+    const slugCandidate = this.slugify(raw);
     const posts = this.sortDesc(await this.readPosts());
-    const filtered = posts.filter((p) => {
-      const inHeader = p.header?.toLowerCase().includes(term);
-      const inContent = p.content?.toLowerCase().includes(term);
-      const inTags = Array.isArray(p.tags) && p.tags.some((t) => t.toLowerCase().includes(term));
-      const inUser = p.userName?.toLowerCase().includes(term);
-      return inHeader || inContent || inTags || inUser;
+
+    const evaluated = posts
+      .map((post) => {
+        const header = (post.header ?? '').toLowerCase();
+        const content = (post.content ?? '').toLowerCase();
+        const userName = (post.userName ?? '').toLowerCase();
+        const tags = Array.isArray(post.tags) ? post.tags.map((t) => (t ?? '').toLowerCase()) : [];
+        const slug = (post.slug ?? '').toLowerCase();
+
+        const includesAll = (value: string) => tokens.every((token) => value.includes(token));
+        const includesAny = (value: string) => tokens.some((token) => value.includes(token));
+
+        const scoreField = (value: string, weightAll: number, weightAny: number) => {
+          if (!value) return 0;
+          if (includesAll(value)) return weightAll;
+          return includesAny(value) ? weightAny : 0;
+        };
+
+        const slugExactMatch = slugCandidate && slug === slugCandidate;
+        let score = slugExactMatch ? 100 : 0;
+
+        score += scoreField(header, 24, 12);
+        score += scoreField(content, 16, 8);
+        score += scoreField(userName, 6, 3);
+
+        const tagsScore = tags.reduce((acc, tag) => {
+          if (!tag) return acc;
+          if (includesAll(tag)) return Math.max(acc, 10);
+          if (includesAny(tag)) return Math.max(acc, 5);
+          return acc;
+        }, 0);
+        score += tagsScore;
+
+        if (!slugExactMatch && includesAny(slug)) {
+          score += 10;
+        }
+
+        return { post, score, slugExactMatch };
+      })
+      .filter((result) => result.slugExactMatch || result.score > 0);
+
+    evaluated.sort((a, b) => {
+      if (a.slugExactMatch !== b.slugExactMatch) {
+        return a.slugExactMatch ? -1 : 1;
+      }
+      if (b.score !== a.score) {
+        return b.score - a.score;
+      }
+      return new Date(b.post.createdAt).getTime() - new Date(a.post.createdAt).getTime();
     });
+
     const safeLimit = Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : 5;
-    return filtered.slice(0, safeLimit);
+    return evaluated.slice(0, safeLimit).map((entry) => entry.post);
   }
 
   async create(dto: CreatePostDto, user: { sub: number; username: string; imgProfile?: string }): Promise<Post> {

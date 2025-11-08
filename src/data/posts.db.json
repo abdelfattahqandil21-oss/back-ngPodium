@@ -1,4 +1,97 @@
 [
- 
-
+  {
+    "id": 1,
+    "header": "How JavaScript Executes: From Source Code to Machine Code",
+    "content": "<h1>How JavaScript Executes: From Source Code to Machine Code</h1>\n<p>JavaScript today is not just an interpreted language. Modern engines like V8 use a hybrid Just-In-Time (JIT) execution model to balance quick start-up with long-term performance. Understanding that pipeline helps you reason about performance trade-offs.</p>\n<h2>Parsing the Source</h2>\n<p>When the browser reads your JavaScript, it tokenizes and parses the source into an Abstract Syntax Tree (AST). The AST captures how statements, expressions, and identifiers relate to one another, giving the engine a structural blueprint of your code.</p>\n<h2>Interpreting to Bytecode</h2>\n<p>The interpreter walks the AST and emits bytecode&mdash;an intermediate, low-level representation that the engine can execute immediately. This keeps initial execution fast without waiting for heavy compilation steps.</p>\n<h2>Hot Paths and Optimization</h2>\n<p>While the bytecode runs, the engine profiles execution. Functions that are called often with stable argument shapes become “hot.” The optimizing compiler takes that hot bytecode and turns it into native machine code, applying type-driven and pattern-driven optimizations to squeeze out extra speed.</p>\n<pre class=\"code-block-content\"><code>function hotPath(value) {\n  if (typeof value === 'number') {\n    return value * 2;\n  }\n  return Number(value) || 0;\n}\n</code></pre>\n<p>Keeping argument types predictable allows engines to keep this machine code version active without unnecessary de-optimizations.</p>\n<h2>De-Optimization Safety Net</h2>\n<p>If the runtime behavior changes&mdash;say a function starts receiving values of different types&mdash;the engine can invalidate the optimized machine code. It de-optimizes back to bytecode to stay correct, then may re-optimize if a new steady pattern emerges.</p>\n<h2>Memory Model: Stack vs Heap</h2>\n<p>JavaScript maintains a call stack for execution contexts and primitive values, while the heap stores objects, functions, and closures. Closures keep references to variables from their outer scopes even after those scopes finish executing, which is why managing scope lifetimes matters.</p>\n<h2>Garbage Collection in V8</h2>\n<p>Automatic garbage collection finds heap objects that are no longer reachable. V8 uses a generational strategy: short-lived objects are cleaned up quickly in the young generation, while long-lived objects move to the old generation and are collected less frequently to reduce pauses.</p>\n<h2>Event Loop and Task Ordering</h2>\n<p>The event loop coordinates asynchronous work. Synchronous code runs to completion first, then microtasks (like resolved Promises) flush, followed by macrotasks (such as <code>setTimeout</code> callbacks). This ordering ensures responsive UIs while still executing deferred work predictably.</p>\n<p>For a deeper dive, check the <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"text-sky-400 underline\" href=\"https://v8.dev/blog\">official V8 blog</a>.</p>\n<img src=\"https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=1200\" alt=\"JavaScript engine pipeline illustration\">\n<p><strong>Summary:</strong> Knowing each stage&mdash;from parsing and bytecode execution to optimization, de-optimization, memory management, and the event loop&mdash;helps you write JavaScript that cooperates with the engine for better performance and maintainability.</p>",
+    "coverImg": "/uploads/covers/1762555176416_xzckide6e79.png",
+    "createdAt": "2025-11-07T22:35:00.000Z",
+    "tags": [
+      "angular",
+      "js",
+      "typescript",
+      "javascript",
+      "web-development",
+      "frontend",
+      "v8",
+      "javascriptexecution"
+    ],
+    "slug": "how-javascript-executes-from-source-code-to-machine-code",
+    "userId": 1,
+    "userName": "html",
+    "userImg": "/uploads/profile/html.webp",
+    "updatedAt": null
+  },
+  {
+    "id": 2,
+    "header": "Ahead-of-Time (AOT) Compilation Explained",
+    "content": "<h1>Ahead-of-Time (AOT) Compilation in Angular</h1>\n<p>Ahead-of-Time (AOT) compilation lets Angular convert TypeScript and templates into optimized JavaScript before the app ever reaches the browser. Shipping precompiled code means faster first paint and smaller bundles for users.</p>\n<h2>Why AOT Matters</h2>\n<p>AOT removes the need for the Just-in-Time (JIT) compiler at runtime, cuts down on template parsing in the browser, and surfaces template errors during build time instead of production.</p>\n<h2>What the AOT Pipeline Does</h2>\n<ul>\n  <li>Analyzes NgModules, components, and templates.</li>\n  <li>Generates Ivy instructions for rendering views.</li>\n  <li>Produces tree-shakable JavaScript ready for minification.</li>\n</ul>\n<pre class=\"code-block-content\"><code>// angular.json excerpt\n&quot;architect&quot;: {\n  &quot;build&quot;: {\n    &quot;configurations&quot;: {\n      &quot;production&quot;: {\n        &quot;aot&quot;: true,\n        &quot;buildOptimizer&quot;: true\n      }\n    }\n  }\n}\n</code></pre>\n<p>Enable AOT in your Angular workspace or run <code>ng build --configuration production</code> to compile ahead of time.</p>\n<p>For deeper docs, visit the <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"text-sky-400 underline\" href=\"https://angular.io/guide/aot-compiler\">Angular AOT guide</a>.</p>\n<img src=\"https://images.unsplash.com/photo-1526379879527-8559ecfcaec0?w=1200\" alt=\"Angular build pipeline illustration\">\n<p><strong>Key takeaway:</strong> AOT shifts template compilation to build time, delivering quicker, safer Angular apps.</p>",
+    "coverImg": "/uploads/covers/1762555176416_xzckide6e79.png",
+    "createdAt": "2025-11-07T22:50:00.000Z",
+    "tags": [
+      "angular",
+      "aot",
+      "compilation",
+      "typescript"
+    ],
+    "slug": "ahead-of-time-aot-compilation-explained",
+    "userId": 1,
+    "userName": "html",
+    "userImg": "/uploads/profile/html.webp",
+    "updatedAt": null
+  },
+  {
+    "id": 3,
+    "header": "Event Loop, Call Stack, and Callback Queue",
+    "content": "<h1>Event Loop, Call Stack, and Callback Queue</h1>\n<p>The JavaScript runtime is single-threaded, but it feels concurrent thanks to the event loop orchestrating work between the call stack, Web APIs, and queues.</p>\n<h2>Call Stack</h2>\n<p>Function frames are pushed onto the call stack as code executes. The stack must empty before any asynchronous callbacks run.</p>\n<h2>Web APIs and Task Sources</h2>\n<p>Browser-provided Web APIs (timers, fetch, DOM events) handle asynchronous operations and schedule callbacks once work completes.</p>\n<h2>Callback and Microtask Queues</h2>\n<pre class=\"code-block-content\"><code>console.log('A');\nsetTimeout(() => console.log('B'), 0);\nPromise.resolve().then(() => console.log('C'));\nconsole.log('D');\n</code></pre>\n<p>The output is <code>A</code>, <code>D</code>, <code>C</code>, then <code>B</code>. Microtasks (Promises) flush before macrotasks (timers) once the stack empties.</p>\n<p>Learn more from Jake Archibald&apos;s <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"text-sky-400 underline\" href=\"https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/\">Tasks, microtasks, queues and schedules</a>.</p>\n<img src=\"https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?w=1200\" alt=\"Event loop visualization\">\n<p><strong>Remember:</strong> keep the call stack light and leverage microtasks wisely for responsive apps.</p>",
+    "coverImg": "/uploads/covers/1762555176416_xzckide6e79.png",
+    "createdAt": "2025-11-07T22:55:00.000Z",
+    "tags": [
+      "javascript",
+      "eventloop",
+      "call stack",
+      "web apis",
+      "async"
+    ],
+    "slug": "event-loop-call-stack-callback-queue",
+    "userId": 1,
+    "userName": "html",
+    "userImg": "/uploads/profile/html.webp",
+    "updatedAt": null
+  },
+  {
+    "id": 4,
+    "header": "Essential Browser Web APIs",
+    "content": "<h1>Essential Browser Web APIs</h1>\n<p>Web APIs extend JavaScript beyond the language itself, offering browser capabilities and platform features that enrich web apps.</p>\n<h2>DOM and BOM APIs</h2>\n<p>The Document Object Model (DOM) lets you query and mutate HTML, while the Browser Object Model (BOM) exposes window, history, and location controls.</p>\n<h2>Networking APIs</h2>\n<p>Fetch, XMLHttpRequest, and WebSocket enable network communication for REST, streaming, and real-time use cases.</p>\n<h2>Storage and Device APIs</h2>\n<ul>\n  <li><strong>Storage:</strong> localStorage, sessionStorage, IndexedDB.</li>\n  <li><strong>Device:</strong> Geolocation, MediaDevices, Notifications.</li>\n</ul>\n<pre class=\"code-block-content\"><code>async function loadProfile() {\n  const response = await fetch('/api/profile');\n  const profile = await response.json();\n  localStorage.setItem('profile', JSON.stringify(profile));\n}\n</code></pre>\n<p>Check MDN&apos;s <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"text-sky-400 underline\" href=\"https://developer.mozilla.org/en-US/docs/Web/API\">Web API catalog</a> for the full landscape.</p>\n<img src=\"https://images.unsplash.com/photo-1527430253228-e93688616381?w=1200\" alt=\"Browser APIs concept illustration\">\n<p><strong>Tip:</strong> Always feature-detect APIs and provide fallbacks for older browsers.</p>",
+    "coverImg": "/uploads/covers/1762555176416_xzckide6e79.png",
+    "createdAt": "2025-11-07T23:00:00.000Z",
+    "tags": [
+      "javascript",
+      "web apis",
+      "browser",
+      "frontend"
+    ],
+    "slug": "essential-browser-web-apis",
+    "userId": 1,
+    "userName": "html",
+    "userImg": "/uploads/profile/html.webp",
+    "updatedAt": null
+  },
+  {
+    "id": 5,
+    "header": "JavaScript Promises and Their Flavors",
+    "content": "<h1>JavaScript Promises and Their Flavors</h1>\n<p>Promises model eventual values, letting you escape callback pyramids and compose async flows declaratively.</p>\n<h2>Promise States</h2>\n<p>A promise is <em>pending</em> until it settles as <strong>fulfilled</strong> or <strong>rejected</strong>. Settlement is immutable.</p>\n<h2>Creating vs. Consuming</h2>\n<pre class=\"code-block-content\"><code>const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));\n\ndelay(200).then(() => console.log('resolved after 200ms'))\n  .catch(console.error)\n  .finally(() => console.log('clean up'));\n</code></pre>\n<p><code>Promise.all</code>, <code>Promise.allSettled</code>, <code>Promise.any</code>, and <code>Promise.race</code> each coordinate collections of promises with different guarantees.</p>\n<h2>Async/Await Sugar</h2>\n<p><code>async</code>/<code>await</code> unwrap promises in a synchronous style while still returning a promise.</p>\n<p>Read the MDN guide on <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"text-sky-400 underline\" href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises\">Using promises</a> for patterns and pitfalls.</p>\n<img src=\"https://images.unsplash.com/photo-1559526324-593bc073d938?w=1200\" alt=\"Promise chaining concept\">\n<p><strong>Bottom line:</strong> Promises tame async complexity when you embrace the right combinators.</p>",
+    "coverImg": "/uploads/covers/1762555176416_xzckide6e79.png",
+    "createdAt": "2025-11-07T23:05:00.000Z",
+    "tags": [
+      "javascript",
+      "promises",
+      "async",
+      "es6"
+    ],
+    "slug": "javascript-promises-and-their-flavors",
+    "userId": 1,
+    "userName": "html",
+    "userImg": "/uploads/profile/html.webp",
+    "updatedAt": null
+  }
 ]
