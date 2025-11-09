@@ -16,9 +16,7 @@ async function bootstrap() {
   app.use(json({ limit: '20mb' }));
   app.use(urlencoded({ limit: '20mb', extended: true }));
 
-  // serve uploaded files (images) from /uploads URL
-  // In production, __dirname points to dist/
-  // In development, __dirname points to src/
+  // Serve uploaded files (images) from /uploads URL
   const uploadsPath = process.env.NODE_ENV === 'production' 
     ? path.join(__dirname, 'data', 'uploads')
     : path.join(process.cwd(), 'src', 'data', 'uploads');
@@ -48,8 +46,10 @@ async function bootstrap() {
   writeFileSync('./swagger.json', JSON.stringify(document, null, 2));
   console.log('✅ Swagger JSON generated at ./swagger.json');
 
-  await app.listen(3000);
-  console.log('🚀 Application running on http://localhost:3000');
-  console.log('📘 Swagger docs at http://localhost:3000/api');
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
+  console.log(`🚀 Application running on http://localhost:${port}`);
+  console.log(`📘 Swagger docs at http://localhost:${port}/api`);
 }
+
 bootstrap();
