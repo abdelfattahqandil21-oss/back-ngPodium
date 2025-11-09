@@ -1,13 +1,3 @@
 [
-  {
-    "id": 1,
-    "name": "abdo",
-    "email": "html@podium.eg",
-    "username": "html",
-    "nickname": "html",
-    "phone": "01009972926",
-    "imgProfile": "/uploads/profile/html.webp",
-    "password": "P@ssw0rd",
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiaHRtbCIsImVtYWlsIjoiaHRtbEBwb2RpdW0uZWciLCJuYW1lIjoiYWJkbyIsIm5pY2tuYW1lIjoiaHRtbCIsInBob25lIjoiMDEwMDk5NzI5MjYiLCJpbWdQcm9maWxlIjoiL3VwbG9hZHMvcHJvZmlsZS9odG1sLndlYnAiLCJpYXQiOjE3NjI2OTEzMzcsImV4cCI6MTc2Mzk4NzMzN30.OKWEm1rxwwNTPZX5Q-qoxOzzrfsx6rZ34vSq5CwUoqM"
-  }
+
 ]
